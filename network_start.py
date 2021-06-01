@@ -1,3 +1,6 @@
+
+from networkx import in_degree_centrality
+
 from start_stas_function import generate_season_for_str
 import networkx as nx
 from matplotlib import pyplot as plt
@@ -109,6 +112,46 @@ def pagerank_initail():
         print(best_roll, [self_roll, loss])
 
 
+def centrality():
+    """
+        计算简单的中心性
+    """
+    for i in range(1, 20):
+        season_str = generate_season_for_str(i)
+        print(season_str)
+        season_stat = season_csv_read(season_str)
+        g = get_win_network(season_stat, -1)
+        nx.draw(g, with_labels=True)
+        plt.savefig('./image_start/{}.jpg'.format(season_str))
+        plt.show()
+
+        in_degree = in_degree_centrality(g)
+        node_size_by_in_degree = []
+        for node, in_degree_num in in_degree.items():
+            g.nodes[node]['in_degree'] = in_degree_num
+            node_size_by_in_degree.append(in_degree_num * 500)
+
+        print("in_degree:")
+        print(sorted(zip(in_degree.values(), in_degree.keys()), reverse=True))
+        nx.draw(g, with_labels=True, node_size=node_size_by_in_degree)
+        plt.savefig('./image_by_in_degree/{}.jpg'.format(season_str))
+        plt.show()
+
+        katz_centrality = nx.katz_centrality_numpy(g)
+        node_size_by_katz_centrality = []
+        for node, katz_centrality_num in katz_centrality.items():
+            g.nodes[node]['katz_centrality'] = katz_centrality_num
+            node_size_by_katz_centrality.append(katz_centrality_num * 1000)
+
+        print("katz_centrality:")
+        print(sorted(zip(katz_centrality.values(), katz_centrality.keys()), reverse=True))
+        nx.draw(g, with_labels=True, node_size=node_size_by_katz_centrality)
+        plt.savefig('./image_by_katz_centrality/{}.jpg'.format(season_str))
+        plt.show()
+
+
+
+
 def goal_diff(stats):
     """
     构建初始网络
@@ -199,4 +242,4 @@ def srs():
         plt.show()
 
 
-srs()
+centrality()
